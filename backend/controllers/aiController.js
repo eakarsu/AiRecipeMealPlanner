@@ -601,3 +601,175 @@ Please provide a detailed cooking schedule in the following JSON format:
     res.status(500).json({ error: error.message });
   }
 };
+
+// AI Dietary Restriction Mapper - convert restrictions to ingredient include/exclude lists
+exports.mapDietaryRestriction = async (req, res) => {
+  try {
+    const { restrictions, cuisine } = req.body;
+    const prompt = `Map the following dietary restriction(s) to concrete include/exclude ingredient lists, hidden-source pitfalls, and label-reading tips.
+
+Restrictions: ${Array.isArray(restrictions) ? restrictions.join(', ') : (restrictions || '')}
+Cuisine context: ${cuisine || 'general'}
+
+Return JSON:
+{
+  "exclude_ingredients": [],
+  "exclude_ingredient_categories": [],
+  "include_safe_alternatives": [{"replaces": "", "alternative": ""}],
+  "hidden_sources_to_watch": [],
+  "label_reading_tips": [],
+  "cross_contamination_risks": [],
+  "summary": ""
+}`;
+    const response = await callOpenRouter([
+      { role: 'system', content: 'You are a registered dietitian. Always respond with valid JSON.' },
+      { role: 'user', content: prompt }
+    ], 4000);
+    const jsonMatch = response.match(/\{[\s\S]*\}/);
+    if (jsonMatch) return res.json({ mapping: JSON.parse(jsonMatch[0]) });
+    return res.json({ mapping: null, rawResponse: response });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// AI Allergen Detection - scan a recipe for cross-contamination/allergen risk
+exports.detectAllergens = async (req, res) => {
+  try {
+    const { recipe, allergyProfile } = req.body;
+    const recipeText = typeof recipe === 'string' ? recipe : JSON.stringify(recipe || {});
+    const prompt = `Scan this recipe for allergens and cross-contamination risk.
+
+Recipe:
+${recipeText}
+
+User Allergy Profile: ${Array.isArray(allergyProfile) ? allergyProfile.join(', ') : (allergyProfile || 'none specified')}
+
+Return JSON:
+{
+  "detected_allergens": [{"allergen": "", "ingredient": "", "severity": "low|moderate|high"}],
+  "cross_contamination_risks": [{"step": "", "risk": "", "mitigation": ""}],
+  "safe_for_user": true,
+  "user_specific_warnings": [],
+  "label_check_required": [],
+  "substitution_suggestions": [{"ingredient": "", "alternative": ""}],
+  "summary": ""
+}`;
+    const response = await callOpenRouter([
+      { role: 'system', content: 'You are a food-safety AI specialized in allergen detection. Always respond with valid JSON.' },
+      { role: 'user', content: prompt }
+    ], 4000);
+    const jsonMatch = response.match(/\{[\s\S]*\}/);
+    if (jsonMatch) return res.json({ allergenReport: JSON.parse(jsonMatch[0]) });
+    return res.json({ allergenReport: null, rawResponse: response });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// AI Seasonal Ingredient Suggester
+exports.budgetOptimizer = async (req, res) => {
+  try {
+    if (!OPENROUTER_API_KEY) {
+      return res.status(503).json({ error: 'AI not configured' });
+    }
+    const { weeklyBudget, householdSize, dietaryRestrictions, cuisinePreferences, regionPriceLevel } = req.body;
+    const prompt = `Build a cost-minimizing weekly meal plan that meets all preferences.
+
+Weekly budget (USD): ${weeklyBudget || 100}
+Household size: ${householdSize || 2}
+Dietary restrictions: ${Array.isArray(dietaryRestrictions) ? dietaryRestrictions.join(', ') : 'none'}
+Cuisine preferences: ${Array.isArray(cuisinePreferences) ? cuisinePreferences.join(', ') : 'none'}
+Region price level (low|average|high): ${regionPriceLevel || 'average'}
+
+Return JSON:
+{
+  "summary": "",
+  "estimated_total_cost_usd": 0,
+  "savings_strategies": [],
+  "meal_plan": [{ "day": "", "breakfast": "", "lunch": "", "dinner": "", "estimated_day_cost_usd": 0 }],
+  "shopping_list": [{ "ingredient": "", "qty": "", "estimated_cost_usd": 0, "store_tier": "discount|standard|premium" }],
+  "bulk_buy_recommendations": [],
+  "swap_suggestions": [{ "expensive_item": "", "cheaper_alternative": "", "savings_usd": 0 }]
+}`;
+    const response = await callOpenRouter([
+      { role: 'system', content: 'You are a cost-conscious culinary AI. Optimise for low cost without sacrificing nutrition. Always respond with valid JSON.' },
+      { role: 'user', content: prompt }
+    ], 6000);
+    const jsonMatch = response.match(/\{[\s\S]*\}/);
+    if (jsonMatch) return res.json({ budgetPlan: JSON.parse(jsonMatch[0]) });
+    return res.json({ budgetPlan: null, rawResponse: response });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.mealPrepPlan = async (req, res) => {
+  try {
+    if (!OPENROUTER_API_KEY) {
+      return res.status(503).json({ error: 'AI not configured' });
+    }
+    const { availableHours, prepDay, mealsPerDay, days, dietaryRestrictions, equipment } = req.body;
+    const prompt = `Design a batch-cooking meal-prep plan that minimises active cooking time across the week.
+
+Available prep hours: ${availableHours || 3}
+Prep day: ${prepDay || 'Sunday'}
+Meals per day: ${mealsPerDay || 3}
+Days covered: ${days || 5}
+Dietary restrictions: ${Array.isArray(dietaryRestrictions) ? dietaryRestrictions.join(', ') : 'none'}
+Equipment: ${Array.isArray(equipment) ? equipment.join(', ') : 'standard kitchen'}
+
+Return JSON:
+{
+  "summary": "",
+  "prep_session_minutes": 0,
+  "stages": [{ "step": 0, "task": "", "duration_min": 0, "parallel_with_step": null }],
+  "batch_recipes": [{ "name": "", "yields_servings": 0, "components": [], "storage": { "fridge_days": 0, "freezer_days": 0 }, "reheat_instructions": "" }],
+  "daily_assembly": [{ "day": "", "breakfast": "", "lunch": "", "dinner": "" }],
+  "containers_needed": [],
+  "tips": []
+}`;
+    const response = await callOpenRouter([
+      { role: 'system', content: 'You are a meal-prep specialist AI. Optimise for batch efficiency and food safety. Always respond with valid JSON.' },
+      { role: 'user', content: prompt }
+    ], 6000);
+    const jsonMatch = response.match(/\{[\s\S]*\}/);
+    if (jsonMatch) return res.json({ prepPlan: JSON.parse(jsonMatch[0]) });
+    return res.json({ prepPlan: null, rawResponse: response });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.seasonalIngredientSuggest = async (req, res) => {
+  try {
+    const { region, month, mealType, dietaryRestrictions } = req.body;
+    const now = new Date();
+    const monthName = month || now.toLocaleString('default', { month: 'long' });
+    const prompt = `Suggest seasonal, locally available ingredients optimized for the time and region given.
+
+Region: ${region || 'Northern Hemisphere temperate'}
+Month: ${monthName}
+Meal type: ${mealType || 'any'}
+Dietary restrictions: ${Array.isArray(dietaryRestrictions) ? dietaryRestrictions.join(', ') : 'none'}
+
+Return JSON:
+{
+  "in_season": [{"ingredient": "", "category": "vegetable|fruit|grain|protein|herb", "peak_freshness": "", "typical_cost": "low|medium|high"}],
+  "fading_out": [],
+  "coming_soon": [],
+  "recipe_ideas": [{"name": "", "key_seasonal_ingredients": []}],
+  "shopping_tips": [],
+  "preservation_tips": []
+}`;
+    const response = await callOpenRouter([
+      { role: 'system', content: 'You are a culinary AI with deep regional/seasonal produce knowledge. Always respond with valid JSON.' },
+      { role: 'user', content: prompt }
+    ], 4000);
+    const jsonMatch = response.match(/\{[\s\S]*\}/);
+    if (jsonMatch) return res.json({ seasonal: JSON.parse(jsonMatch[0]) });
+    return res.json({ seasonal: null, rawResponse: response });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};

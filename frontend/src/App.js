@@ -33,6 +33,33 @@ import NutritionBalances from './pages/NutritionBalances';
 import NutritionBalanceDetail from './pages/NutritionBalanceDetail';
 import CookingTimers from './pages/CookingTimers';
 import CookingTimerDetail from './pages/CookingTimerDetail';
+import DietaryRestrictionMapper from './pages/DietaryRestrictionMapper';
+import AllergenDetection from './pages/AllergenDetection';
+import SeasonalIngredientSuggester from './pages/SeasonalIngredientSuggester';
+import BudgetOptimizer from './pages/BudgetOptimizer';
+import MealPrepPlan from './pages/MealPrepPlan';
+
+// === Batch 07 Gaps & Frontend Mounts ===
+import CfNutritionistintheloopMealPlanning from './pages/CfNutritionistintheloopMealPlanning';
+import CfAllergyintoleranceProfileBuilder from './pages/CfAllergyintoleranceProfileBuilder';
+import CfCostminimizingMealPlanner from './pages/CfCostminimizingMealPlanner';
+import CfCookingSkillProgression from './pages/CfCookingSkillProgression';
+import CfFamilyMealConsensus from './pages/CfFamilyMealConsensus';
+import CfRestaurantMenuDecoder from './pages/CfRestaurantMenuDecoder';
+import GapNoDietaryrestrictionmapperRestrictionsIng from './pages/GapNoDietaryrestrictionmapperRestrictionsIng';
+import GapNoBudgetoptimizerCostawareNutritionGoals from './pages/GapNoBudgetoptimizerCostawareNutritionGoals';
+import GapNoAllergendetectionCrosscontaminationRisk from './pages/GapNoAllergendetectionCrosscontaminationRisk';
+import GapNoSeasonalingredientsuggester from './pages/GapNoSeasonalingredientsuggester';
+import GapNoMealprepplanBatchCookingRecommendation from './pages/GapNoMealprepplanBatchCookingRecommendation';
+import GapNoMealPhotoRecognition from './pages/GapNoMealPhotoRecognition';
+import GapNoRecipeRatingsreviewsRoute from './pages/GapNoRecipeRatingsreviewsRoute';
+import GapNoGroceryStorePriceApiIntegration from './pages/GapNoGroceryStorePriceApiIntegration';
+import GapNoBarcodeproductDatabaseLookupUsdaOpenf from './pages/GapNoBarcodeproductDatabaseLookupUsdaOpenf';
+import GapNoPantryInventoryTracking from './pages/GapNoPantryInventoryTracking';
+import GapNoSharingsocialFeatures from './pages/GapNoSharingsocialFeatures';
+import GapNoNotificationsForShoppingReminders from './pages/GapNoNotificationsForShoppingReminders';
+// === End Batch 07 ===
+
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
@@ -91,6 +118,31 @@ function App() {
               <Route path="/nutrition-balances/:id" element={<ProtectedRoute><ErrorBoundary><NutritionBalanceDetail /></ErrorBoundary></ProtectedRoute>} />
               <Route path="/cooking-timers" element={<ProtectedRoute><ErrorBoundary><CookingTimers /></ErrorBoundary></ProtectedRoute>} />
               <Route path="/cooking-timers/:id" element={<ProtectedRoute><ErrorBoundary><CookingTimerDetail /></ErrorBoundary></ProtectedRoute>} />
+              <Route path="/dietary-restriction-mapper" element={<ProtectedRoute><ErrorBoundary><DietaryRestrictionMapper /></ErrorBoundary></ProtectedRoute>} />
+              <Route path="/allergen-detection" element={<ProtectedRoute><ErrorBoundary><AllergenDetection /></ErrorBoundary></ProtectedRoute>} />
+              <Route path="/seasonal-ingredient-suggester" element={<ProtectedRoute><ErrorBoundary><SeasonalIngredientSuggester /></ErrorBoundary></ProtectedRoute>} />
+              <Route path="/budget-optimizer" element={<ProtectedRoute><ErrorBoundary><BudgetOptimizer /></ErrorBoundary></ProtectedRoute>} />
+              <Route path="/meal-prep-plan" element={<ProtectedRoute><ErrorBoundary><MealPrepPlan /></ErrorBoundary></ProtectedRoute>} />
+          // === Batch 07 Gaps & Frontend Mounts ===
+          <Route path='/cf-nutritionistintheloop-meal-planning' element={<CfNutritionistintheloopMealPlanning />} />
+          <Route path='/cf-allergyintolerance-profile-builder' element={<CfAllergyintoleranceProfileBuilder />} />
+          <Route path='/cf-costminimizing-meal-planner' element={<CfCostminimizingMealPlanner />} />
+          <Route path='/cf-cooking-skill-progression' element={<CfCookingSkillProgression />} />
+          <Route path='/cf-family-meal-consensus' element={<CfFamilyMealConsensus />} />
+          <Route path='/cf-restaurant-menu-decoder' element={<CfRestaurantMenuDecoder />} />
+          <Route path='/gap-no-dietaryrestrictionmapper-restrictions-ing' element={<GapNoDietaryrestrictionmapperRestrictionsIng />} />
+          <Route path='/gap-no-budgetoptimizer-costaware-nutrition-goals' element={<GapNoBudgetoptimizerCostawareNutritionGoals />} />
+          <Route path='/gap-no-allergendetection-crosscontamination-risk' element={<GapNoAllergendetectionCrosscontaminationRisk />} />
+          <Route path='/gap-no-seasonalingredientsuggester' element={<GapNoSeasonalingredientsuggester />} />
+          <Route path='/gap-no-mealprepplan-batch-cooking-recommendation' element={<GapNoMealprepplanBatchCookingRecommendation />} />
+          <Route path='/gap-no-meal-photo-recognition' element={<GapNoMealPhotoRecognition />} />
+          <Route path='/gap-no-recipe-ratingsreviews-route' element={<GapNoRecipeRatingsreviewsRoute />} />
+          <Route path='/gap-no-grocery-store-price-api-integration' element={<GapNoGroceryStorePriceApiIntegration />} />
+          <Route path='/gap-no-barcodeproduct-database-lookup-usda-openf' element={<GapNoBarcodeproductDatabaseLookupUsdaOpenf />} />
+          <Route path='/gap-no-pantry-inventory-tracking' element={<GapNoPantryInventoryTracking />} />
+          <Route path='/gap-no-sharingsocial-features' element={<GapNoSharingsocialFeatures />} />
+          <Route path='/gap-no-notifications-for-shopping-reminders' element={<GapNoNotificationsForShoppingReminders />} />
+          // === End Batch 07 ===
             </Routes>
           </Router>
         </ErrorBoundary>
