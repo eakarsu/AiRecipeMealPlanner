@@ -63,3 +63,11 @@ app.use('/api/gap-no-pantry-inventory-tracking', require('./routes/gap-no-pantry
 app.use('/api/gap-no-sharingsocial-features', require('./routes/gap-no-sharingsocial-features'));
 app.use('/api/gap-no-notifications-for-shopping-reminders', require('./routes/gap-no-notifications-for-shopping-reminders'));
 // === End Batch 07 ===
+
+// Custom views (4 endpoints) — mounted BEFORE any 404 handler
+app.use('/api/custom-views', require('./routes/customViews'));
+
+// 404 handler (after all route mounts)
+app.use((req, res) => {
+  res.status(404).json({ error: 'Not Found', path: req.originalUrl });
+});

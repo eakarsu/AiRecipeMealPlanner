@@ -60,6 +60,9 @@ import GapNoSharingsocialFeatures from './pages/GapNoSharingsocialFeatures';
 import GapNoNotificationsForShoppingReminders from './pages/GapNoNotificationsForShoppingReminders';
 // === End Batch 07 ===
 
+// Custom Views (4 endpoints, 4 components, 1 page)
+import CustomViewsPage from './pages/CustomViewsPage';
+
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
@@ -143,6 +146,7 @@ function App() {
           <Route path='/gap-no-sharingsocial-features' element={<GapNoSharingsocialFeatures />} />
           <Route path='/gap-no-notifications-for-shopping-reminders' element={<GapNoNotificationsForShoppingReminders />} />
           // === End Batch 07 ===
+              <Route path="/custom-views" element={<ProtectedRoute><ErrorBoundary><CustomViewsPage /></ErrorBoundary></ProtectedRoute>} />
             </Routes>
           </Router>
         </ErrorBoundary>
