@@ -46,3 +46,28 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+// AI feature mount: cost-meal-plan
+app.use('/api/ai/cost-meal-plan', require('./routes/ai-cost-meal-plan'));
+// === Batch 07 Gaps & Frontend Mounts ===
+app.use('/api/gap-no-dietaryrestrictionmapper-restrictions-ing', require('./routes/gap-no-dietaryrestrictionmapper-restrictions-ing'));
+app.use('/api/gap-no-budgetoptimizer-costaware-nutrition-goals', require('./routes/gap-no-budgetoptimizer-costaware-nutrition-goals'));
+app.use('/api/gap-no-allergendetection-crosscontamination-risk', require('./routes/gap-no-allergendetection-crosscontamination-risk'));
+app.use('/api/gap-no-seasonalingredientsuggester', require('./routes/gap-no-seasonalingredientsuggester'));
+app.use('/api/gap-no-mealprepplan-batch-cooking-recommendation', require('./routes/gap-no-mealprepplan-batch-cooking-recommendation'));
+app.use('/api/gap-no-meal-photo-recognition', require('./routes/gap-no-meal-photo-recognition'));
+app.use('/api/gap-no-recipe-ratingsreviews-route', require('./routes/gap-no-recipe-ratingsreviews-route'));
+app.use('/api/gap-no-grocery-store-price-api-integration', require('./routes/gap-no-grocery-store-price-api-integration'));
+app.use('/api/gap-no-barcodeproduct-database-lookup-usda-openf', require('./routes/gap-no-barcodeproduct-database-lookup-usda-openf'));
+app.use('/api/gap-no-pantry-inventory-tracking', require('./routes/gap-no-pantry-inventory-tracking'));
+app.use('/api/gap-no-sharingsocial-features', require('./routes/gap-no-sharingsocial-features'));
+app.use('/api/gap-no-notifications-for-shopping-reminders', require('./routes/gap-no-notifications-for-shopping-reminders'));
+// === End Batch 07 ===
+
+// Custom views (4 endpoints) — mounted BEFORE any 404 handler
+app.use('/api/custom-views', require('./routes/customViews'));
+
+// 404 handler (after all route mounts)
+app.use((req, res) => {
+  res.status(404).json({ error: 'Not Found', path: req.originalUrl });
+});

@@ -36,4 +36,19 @@ router.post('/balance-nutrition', auth, aiController.balanceNutrition);
 // AI Cooking Timer - Create intelligent cooking schedule
 router.post('/create-cooking-timer', auth, aiController.createCookingTimer);
 
+// AI Dietary Restriction Mapper
+router.post('/dietary-restriction-mapper', auth, aiController.mapDietaryRestriction);
+
+// AI Allergen Detection
+router.post('/allergen-detection', auth, aiController.detectAllergens);
+
+// AI Seasonal Ingredient Suggester
+router.post('/seasonal-ingredient-suggester', auth, aiController.seasonalIngredientSuggest);
+
+// AI Budget Optimizer - Cost-minimising weekly meal plan
+router.post('/budget-optimizer', auth, aiController.budgetOptimizer);
+
+// AI Meal Prep Plan - Batch-cooking schedule
+router.post('/meal-prep-plan', auth, aiController.mealPrepPlan);
+
 module.exports = router;
