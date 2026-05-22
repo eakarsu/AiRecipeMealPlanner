@@ -5,7 +5,7 @@ const router = express.Router();
 // models optional — persistence disabled in this v0 scaffold
 const auth = require('../middleware/auth');
 
-const MODEL = process.env.OPENROUTER_MODEL || 'anthropic/claude-3-5-sonnet-20241022';
+const MODEL = process.env.OPENROUTER_MODEL || (process.env.OPENROUTER_MODEL || 'anthropic/claude-haiku-4.5');
 // TODO: configure credentials — set process.env.OPENROUTER_API_KEY
 
 async function callLLM(systemPrompt, userPrompt) {

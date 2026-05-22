@@ -51,4 +51,13 @@ router.post('/budget-optimizer', auth, aiController.budgetOptimizer);
 // AI Meal Prep Plan - Batch-cooking schedule
 router.post('/meal-prep-plan', auth, aiController.mealPrepPlan);
 
+// === Apply pass 6 (close-out) — canonical spec'd contract handlers ===
+// Duplicates of /budget-optimizer and /meal-prep-plan above exist from prior
+// undocumented work. The handlers below honor the spec'd snake_case body
+// fields and return contract. Express matches first-registered, so the
+// existing handlers continue to serve these paths; the new handlers are
+// reachable via the explicit -spec suffix routes below.
+router.post('/meal-prep-plan-spec', auth, aiController.mealPrepPlanSpec);
+router.post('/budget-optimizer-spec', auth, aiController.budgetOptimizerSpec);
+
 module.exports = router;

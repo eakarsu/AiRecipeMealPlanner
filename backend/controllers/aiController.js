@@ -773,3 +773,128 @@ Return JSON:
     res.status(500).json({ error: error.message });
   }
 };
+
+// === Apply pass 6 (close-out) — canonical spec'd handlers ===
+// NOTE: duplicates exist (exports.budgetOptimizer L671, exports.mealPrepPlan L707)
+// from prior undocumented work with different body/return shapes. These new
+// handlers honor the spec'd snake_case body fields and return contract.
+
+// AI Meal Prep Plan — batch cooking recommendations (spec'd contract)
+exports.mealPrepPlanSpec = async (req, res) => {
+  try {
+    if (!OPENROUTER_API_KEY) {
+      return res.status(503).json({ error: 'AI not configured' });
+    }
+    const {
+      household_size,
+      days,
+      dietary_restrictions,
+      kitchen_equipment,
+      time_budget_per_session_min
+    } = req.body;
+    const prompt = `Design a batch-cooking meal-prep plan that minimizes active cooking time across multiple prep sessions.
+
+Household size: ${household_size || 2}
+Days covered: ${days || 5}
+Dietary restrictions: ${Array.isArray(dietary_restrictions) ? dietary_restrictions.join(', ') : 'none'}
+Kitchen equipment: ${Array.isArray(kitchen_equipment) ? kitchen_equipment.join(', ') : 'standard kitchen'}
+Time budget per prep session (minutes): ${time_budget_per_session_min || 120}
+
+Return JSON exactly matching this shape:
+{
+  "prep_sessions": [
+    {
+      "day": "",
+      "duration_min": 0,
+      "batches": [
+        {
+          "dish": "",
+          "servings": 0,
+          "storage": "fridge|freezer|pantry",
+          "lifespan_days": 0,
+          "reheating": ""
+        }
+      ],
+      "shopping_list_consolidated": []
+    }
+  ],
+  "total_active_minutes": 0,
+  "leftover_strategy": ""
+}`;
+    const response = await callOpenRouter([
+      { role: 'system', content: 'You are a meal-prep specialist AI. Optimize for batch efficiency, food safety, and minimal active cooking time. Always respond with valid JSON.' },
+      { role: 'user', content: prompt }
+    ], 6000);
+    const jsonMatch = response.match(/\{[\s\S]*\}/);
+    if (jsonMatch) return res.json(JSON.parse(jsonMatch[0]));
+    return res.json({ prep_sessions: [], total_active_minutes: 0, leftover_strategy: '', rawResponse: response });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// AI Budget Optimizer — cost-minimizing meal planner (spec'd contract; LLM-only, caller-supplied price hints)
+exports.budgetOptimizerSpec = async (req, res) => {
+  try {
+    if (!OPENROUTER_API_KEY) {
+      return res.status(503).json({ error: 'AI not configured' });
+    }
+    const {
+      weekly_budget_usd,
+      household_size,
+      dietary_restrictions,
+      location_hint,
+      current_pantry
+    } = req.body;
+    const prompt = `Build a cost-minimizing weekly meal plan within the supplied budget. Use only caller-supplied context — do not assume external grocery price feeds. If price hints are absent, estimate conservatively from the location hint.
+
+Weekly budget (USD): ${weekly_budget_usd || 100}
+Household size: ${household_size || 2}
+Dietary restrictions: ${Array.isArray(dietary_restrictions) ? dietary_restrictions.join(', ') : 'none'}
+Location hint: ${location_hint || 'unspecified (assume average US suburb)'}
+Current pantry items: ${Array.isArray(current_pantry) ? current_pantry.join(', ') : 'none'}
+
+Return JSON exactly matching this shape:
+{
+  "meal_plan": [
+    {
+      "day": "",
+      "meals": [
+        {
+          "name": "",
+          "estimated_cost": 0,
+          "key_ingredients": []
+        }
+      ]
+    }
+  ],
+  "total_estimated_cost": 0,
+  "savings_tips": [],
+  "shopping_list_with_substitutions": [
+    {
+      "ingredient": "",
+      "qty": "",
+      "estimated_cost": 0,
+      "cheaper_substitution": ""
+    }
+  ],
+  "cost_breakdown": {
+    "proteins": 0,
+    "produce": 0,
+    "grains": 0,
+    "dairy": 0,
+    "pantry": 0,
+    "other": 0
+  }
+}`;
+    const response = await callOpenRouter([
+      { role: 'system', content: 'You are a cost-conscious culinary AI. Optimize for low cost without sacrificing nutrition. Use only caller-supplied price hints; do not invent live grocery prices. Always respond with valid JSON.' },
+      { role: 'user', content: prompt }
+    ], 6000);
+    const jsonMatch = response.match(/\{[\s\S]*\}/);
+    if (jsonMatch) return res.json(JSON.parse(jsonMatch[0]));
+    return res.json({ meal_plan: [], total_estimated_cost: 0, savings_tips: [], shopping_list_with_substitutions: [], cost_breakdown: {}, rawResponse: response });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
