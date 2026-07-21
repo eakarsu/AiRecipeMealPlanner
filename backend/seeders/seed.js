@@ -4,13 +4,18 @@ const {
   DietaryProfile, GroceryOptimization, LeftoverSuggestion, NutritionBalance, CookingTimer
 } = require('../models');
 
+if (process.env.NODE_ENV === 'production' || process.env.ALLOW_DEMO_SEED !== 'true') throw new Error('Demo seed is disabled outside an explicitly approved non-production database.');
+const demoEmail = String(process.env.DEMO_EMAIL || '').trim().toLowerCase();
+const demoPassword = String(process.env.DEMO_PASSWORD || '');
+if (!demoEmail || demoPassword.length < 12) throw new Error('DEMO_EMAIL and a 12+ character DEMO_PASSWORD are required.');
+
 async function seed() {
   console.log('Seeding database...');
 
   // Create demo user
   const user = await User.create({
-    email: process.env.DEMO_EMAIL || 'demo@example.com',
-    password: process.env.DEMO_PASSWORD || 'demo123',
+    email: demoEmail,
+    password: demoPassword,
     name: 'Demo User'
   });
 

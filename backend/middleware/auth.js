@@ -10,7 +10,7 @@ const auth = async (req, res, next) => {
     }
 
     const token = authHeader.replace('Bearer ', '');
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-super-secret-jwt-key');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     const user = await User.findByPk(decoded.id);
 

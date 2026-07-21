@@ -33,7 +33,7 @@ router.post('/register', authLimiter, registerValidation, async (req, res) => {
 
     const token = jwt.sign(
       { id: user.id },
-      process.env.JWT_SECRET || 'your-super-secret-jwt-key',
+      process.env.JWT_SECRET,
       { expiresIn: '7d' }
     );
 
@@ -65,7 +65,7 @@ router.post('/login', authLimiter, loginValidation, async (req, res) => {
 
     const token = jwt.sign(
       { id: user.id },
-      process.env.JWT_SECRET || 'your-super-secret-jwt-key',
+      process.env.JWT_SECRET,
       { expiresIn: '7d' }
     );
 
@@ -125,7 +125,7 @@ router.put('/change-password', auth, changePasswordValidation, async (req, res) 
 
     const token = jwt.sign(
       { id: req.user.id },
-      process.env.JWT_SECRET || 'your-super-secret-jwt-key',
+      process.env.JWT_SECRET,
       { expiresIn: '7d' }
     );
 
@@ -181,7 +181,7 @@ router.post('/reset-password', passwordResetLimiter, passwordResetValidation, as
 
     const jwtToken = jwt.sign(
       { id: user.id },
-      process.env.JWT_SECRET || 'your-super-secret-jwt-key',
+      process.env.JWT_SECRET,
       { expiresIn: '7d' }
     );
 

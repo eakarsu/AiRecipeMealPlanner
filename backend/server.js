@@ -1,73 +1,27 @@
-require('dotenv').config({ path: '../.env' });
-const express = require('express');
-const cors = require('cors');
-const helmet = require('helmet');
-const db = require('./models');
-const { generalLimiter } = require('./middleware/rateLimiter');
+const express=require('express');
+const cors=require('cors');
+const path=require('path');
+require('dotenv').config({path:path.join(__dirname,'../.env')});
+const governanceRouter=require('./governance/router');
+const {validateRuntime}=require('./governance/runtime');
+const {createProviderGate}=require('./governance/providerGate');
 
-const app = express();
-const PORT = process.env.BACKEND_PORT || 5001;
+validateRuntime();
+const app=express();
+const port=Number(process.env.BACKEND_PORT);
+if(!Number.isInteger(port)||port<1||port>65535)throw new Error('BACKEND_PORT must be an assigned TCP port.');
+const origins=String(process.env.CORS_ORIGINS||'').split(',').map(value=>value.trim()).filter(Boolean);
+if(!origins.length||origins.includes('*'))throw new Error('CORS_ORIGINS must be an explicit allowlist.');
+app.disable('x-powered-by');
+app.use((_req,res,next)=>{res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','no-referrer');next();});
+app.use(cors({origin:(origin,callback)=>!origin||origins.includes(origin)?callback(null,true):callback(new Error('Origin not allowed by CORS')),credentials:true}));
+app.use(express.json({limit:'1mb'}));
+app.use(createProviderGate(['/api/ai','/api/gap','/api/generated','/api/order','/api/device','/api/allergen']));
+app.get('/api/health',(_req,res)=>res.json({status:'ok',workflow:'approved_meal_plan',notMedicalAdvice:true,timestamp:new Date().toISOString()}));
+app.use('/api/auth',require('./routes/auth'));
+app.use('/api/governance',governanceRouter);
+app.use((_req,res)=>res.status(404).json({error:'ROUTE_NOT_SUPPORTED'}));
+app.use((error,_req,res,_next)=>{console.error('Request failed:',error.message);res.status(500).json({error:'INTERNAL_SERVER_ERROR'});});
+app.listen(port,()=>console.log(`Governed meal-planner API listening on ${port}`));
 
-// Security middleware
-app.use(helmet());
-app.use(cors());
-app.use(express.json({ limit: '10mb' }));
-app.use(generalLimiter);
-
-// Health check endpoint
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
-});
-
-// Routes
-app.use('/api/auth', require('./routes/auth'));
-app.use('/api/recipes', require('./routes/recipes'));
-app.use('/api/meal-plans', require('./routes/mealPlans'));
-app.use('/api/grocery-lists', require('./routes/groceryLists'));
-app.use('/api/nutrition', require('./routes/nutrition'));
-app.use('/api/ingredients', require('./routes/ingredients'));
-app.use('/api/categories', require('./routes/categories'));
-app.use('/api/ai', require('./routes/ai'));
-
-// New AI Feature Routes
-app.use('/api/dietary-profiles', require('./routes/dietaryProfiles'));
-app.use('/api/grocery-optimizations', require('./routes/groceryOptimizations'));
-app.use('/api/leftover-suggestions', require('./routes/leftoverSuggestions'));
-app.use('/api/nutrition-balances', require('./routes/nutritionBalances'));
-app.use('/api/cooking-timers', require('./routes/cookingTimers'));
-
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ error: 'Something went wrong!' });
-});
-
-// Start server
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
-
-// AI feature mount: cost-meal-plan
-app.use('/api/ai/cost-meal-plan', require('./routes/ai-cost-meal-plan'));
-// === Batch 07 Gaps & Frontend Mounts ===
-app.use('/api/gap-no-dietaryrestrictionmapper-restrictions-ing', require('./routes/gap-no-dietaryrestrictionmapper-restrictions-ing'));
-app.use('/api/gap-no-budgetoptimizer-costaware-nutrition-goals', require('./routes/gap-no-budgetoptimizer-costaware-nutrition-goals'));
-app.use('/api/gap-no-allergendetection-crosscontamination-risk', require('./routes/gap-no-allergendetection-crosscontamination-risk'));
-app.use('/api/gap-no-seasonalingredientsuggester', require('./routes/gap-no-seasonalingredientsuggester'));
-app.use('/api/gap-no-mealprepplan-batch-cooking-recommendation', require('./routes/gap-no-mealprepplan-batch-cooking-recommendation'));
-app.use('/api/gap-no-meal-photo-recognition', require('./routes/gap-no-meal-photo-recognition'));
-app.use('/api/gap-no-recipe-ratingsreviews-route', require('./routes/gap-no-recipe-ratingsreviews-route'));
-app.use('/api/gap-no-grocery-store-price-api-integration', require('./routes/gap-no-grocery-store-price-api-integration'));
-app.use('/api/gap-no-barcodeproduct-database-lookup-usda-openf', require('./routes/gap-no-barcodeproduct-database-lookup-usda-openf'));
-app.use('/api/gap-no-pantry-inventory-tracking', require('./routes/gap-no-pantry-inventory-tracking'));
-app.use('/api/gap-no-sharingsocial-features', require('./routes/gap-no-sharingsocial-features'));
-app.use('/api/gap-no-notifications-for-shopping-reminders', require('./routes/gap-no-notifications-for-shopping-reminders'));
-// === End Batch 07 ===
-
-// Custom views (4 endpoints) — mounted BEFORE any 404 handler
-app.use('/api/custom-views', require('./routes/customViews'));
-
-// 404 handler (after all route mounts)
-app.use((req, res) => {
-  res.status(404).json({ error: 'Not Found', path: req.originalUrl });
-});
+module.exports=app;

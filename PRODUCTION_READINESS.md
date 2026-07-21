@@ -1,0 +1,7 @@
+# Governed meal-plan workflow
+
+The supported API is `/api/governance`. It records explicit preferences, consent, dietary sources, authoritative allergen/nutrition versions, cross-contamination review, editable plans, accessibility/budget checks, owner approval, sync receipts, feedback correction, revocation, and deletion. It is not medical advice and never guarantees allergen safety, orders groceries, or controls appliances autonomously.
+
+Apply `backend/migrations/001_governed_meal_plan.sql` separately. Pre-provision household memberships. Calendar, commerce, grocery, recipe, nutrition, allergen, read-only device, and notification workers remain disabled until least-privilege scopes, credentials, typed contracts, signed receipts, revocation/deletion propagation, retry/dead-letter, and recovery pass. The allergen/cross-contamination gap is replaced by durable evidence and mandatory food-safety review on the supported path.
+
+Use `.env.example`; production rejects weak secrets, wildcard CORS, demo/mock/provider flags, and startup mutation. `start.sh` never installs, seeds, migrates, resets data, or reclaims ports. Food-safety and nutrition reviewers plus representative households must validate allergies, facility contamination, medical-diet escalation, relevance, diversity, cold start, drift, accessibility, age protections, budgets, substitutions, failures, export/delete, and outcomes. No grocery order or allergen-safety guarantee was made here.

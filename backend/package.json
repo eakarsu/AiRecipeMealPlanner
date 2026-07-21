@@ -5,8 +5,10 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
+    "test": "node --test governance/*.test.cjs",
     "dev": "nodemon server.js",
-    "seed": "node seeders/seed.js"
+    "seed": "node seeders/seed.js",
+    "create-admin": "node scripts/create-admin.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

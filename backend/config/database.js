@@ -1,21 +1,14 @@
 require('dotenv').config({ path: '../../.env' });
+if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL is required.');
 
 module.exports = {
   development: {
-    username: process.env.DB_USER || 'postgres',
-    password: process.env.DB_PASSWORD || 'postgres',
-    database: process.env.DB_NAME || 'ai_recipe_meal_planner',
-    host: process.env.DB_HOST || 'localhost',
-    port: process.env.DB_PORT || 5432,
+    use_env_variable: 'DATABASE_URL',
     dialect: 'postgres',
     logging: false
   },
   production: {
-    username: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
+    use_env_variable: 'DATABASE_URL',
     dialect: 'postgres',
     logging: false
   }

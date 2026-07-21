@@ -1,17 +1,8 @@
 const { Sequelize } = require('sequelize');
 require('dotenv').config({ path: '../.env' });
 
-const sequelize = new Sequelize(
-  process.env.DB_NAME || 'ai_recipe_meal_planner',
-  process.env.DB_USER || 'postgres',
-  process.env.DB_PASSWORD || 'postgres',
-  {
-    host: process.env.DB_HOST || 'localhost',
-    port: process.env.DB_PORT || 5432,
-    dialect: 'postgres',
-    logging: false
-  }
-);
+if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL is required.');
+const sequelize = new Sequelize(process.env.DATABASE_URL, { dialect: 'postgres', logging: false });
 
 // Import models
 const User = require('./User')(sequelize);
