@@ -11,8 +11,8 @@ function Login() {
   const navigate = useNavigate();
 
   const handleAutoFill = () => {
-    setEmail('demo@example.com');
-    setPassword('demo123');
+    setEmail(process.env.REACT_APP_DEMO_EMAIL || '');
+    setPassword(process.env.REACT_APP_DEMO_PASSWORD || '');
   };
 
   const handleSubmit = async (e) => {
