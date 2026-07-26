@@ -69,11 +69,18 @@ set +a
 [[ "$FRONTEND_PORT" =~ ^[0-9]+$ ]] || { echo "FRONTEND_PORT must be an integer" >&2; exit 1; }
 [[ ${#JWT_SECRET} -ge 32 ]] || { echo "JWT_SECRET must be at least 32 characters" >&2; exit 1; }
 if [[ "${NODE_ENV:-}" == test ]]; then CORS_ORIGINS="http://127.0.0.1:$FRONTEND_PORT"; else : "${CORS_ORIGINS:?CORS_ORIGINS is required outside test mode}"; fi
+listen_host="${APP_LISTEN_HOST:-${HOST:-127.0.0.1}}"
+public_host="${APP_PUBLIC_HOST:-127.0.0.1}"
+public_origin="http://$public_host:$FRONTEND_PORT"
+case ",$CORS_ORIGINS," in
+  *",$public_origin,"*) ;;
+  *) CORS_ORIGINS="$CORS_ORIGINS,$public_origin" ;;
+esac
 export CORS_ORIGINS
 for dependency_dir in "$project_dir/backend/node_modules" "$project_dir/frontend/node_modules"; do [[ -d "$dependency_dir" ]] || { echo "Missing dependencies: $dependency_dir" >&2; exit 1; }; done
 for assigned_port in "$BACKEND_PORT" "$FRONTEND_PORT"; do lsof -nP -iTCP:"$assigned_port" -sTCP:LISTEN >/dev/null 2>&1 && { echo "Assigned port $assigned_port is already occupied" >&2; exit 1; }; done
 (cd "$project_dir/backend" && exec env BACKEND_PORT="$BACKEND_PORT" CORS_ORIGINS="$CORS_ORIGINS" npm start) & backend_pid=$!
-(cd "$project_dir/frontend" && exec env PORT="$FRONTEND_PORT" REACT_APP_API_URL="http://127.0.0.1:$BACKEND_PORT/api" BROWSER=none npm start) & frontend_pid=$!
+(cd "$project_dir/frontend" && exec env HOST="$listen_host" PORT="$FRONTEND_PORT" REACT_APP_API_URL="http://$public_host:$BACKEND_PORT/api" BROWSER=none npm start) & frontend_pid=$!
 cleanup(){ trap - EXIT INT TERM; kill "$backend_pid" "$frontend_pid" 2>/dev/null || true; wait "$backend_pid" "$frontend_pid" 2>/dev/null || true; }
 trap cleanup EXIT INT TERM
 wait "$backend_pid" "$frontend_pid"
