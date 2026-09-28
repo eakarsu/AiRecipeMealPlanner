@@ -94,7 +94,7 @@ function Login() {
               onClick={handleAutoFill}
               className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-3 px-4 rounded-lg transition-colors"
             >
-              Auto-fill Demo Credentials
+              Auto Fill Demo Credentials
             </button>
           </form>
 
