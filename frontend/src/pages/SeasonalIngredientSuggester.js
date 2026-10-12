@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import api from '../api/axios';
 import { showToast } from '../components/ToastProvider';
+import JsonReport from '../components/JsonReport';
 
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
@@ -111,7 +112,7 @@ function SeasonalIngredientSuggester() {
               <h3 className="text-sm font-semibold text-gray-700 mb-2">Recipe Ideas</h3>
               <ul className="text-sm text-gray-700 space-y-1 list-disc pl-5">
                 {result.recipe_ideas.map((r, i) => (
-                  <li key={i}>{typeof r === 'string' ? r : (r.title ? <><strong>{r.title}</strong>{r.description ? ` — ${r.description}` : ''}</> : JSON.stringify(r))}</li>
+                  <li key={i}>{typeof r === 'string' ? r : (r.title ? <><strong>{r.title}</strong>{r.description ? ` — ${r.description}` : ''}</> : <JsonReport data={r} title="Recipe idea" />)}</li>
                 ))}
               </ul>
             </div>
@@ -130,7 +131,7 @@ function Section({ title, items }) {
     <div>
       <h3 className="text-sm font-semibold text-gray-700 mb-2">{title}</h3>
       <ul className="text-sm text-gray-700 space-y-1 list-disc pl-5">
-        {items.map((it, i) => <li key={i}>{typeof it === 'string' ? it : JSON.stringify(it)}</li>)}
+        {items.map((it, i) => <li key={i}>{typeof it === 'string' ? it : <JsonReport data={it} title={title} />}</li>)}
       </ul>
     </div>
   );

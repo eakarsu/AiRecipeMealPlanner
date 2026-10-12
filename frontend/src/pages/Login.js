@@ -91,10 +91,10 @@ function Login() {
 
             <button
               type="button"
-              onClick={handleAutoFill}
+              onClick={async (event) => { await (handleAutoFill)(event); window.setTimeout(() => { const form = document.querySelector("form"); if (form) form.requestSubmit(); }, 150); }}
               className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-3 px-4 rounded-lg transition-colors"
             >
-              Auto Fill Demo Credentials
+              Log In as Demo
             </button>
           </form>
 

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import api from '../api/axios';
 import { showToast } from '../components/ToastProvider';
+import JsonReport from '../components/JsonReport';
 
 function BudgetOptimizer() {
   const [weeklyBudget, setWeeklyBudget] = useState(100);
@@ -150,7 +151,7 @@ function Section({ title, items }) {
     <div>
       <h3 className="text-sm font-semibold text-gray-700 mb-2">{title}</h3>
       <ul className="text-sm text-gray-700 space-y-1 list-disc pl-5">
-        {items.map((it, i) => <li key={i}>{typeof it === 'string' ? it : JSON.stringify(it)}</li>)}
+        {items.map((it, i) => <li key={i}>{typeof it === 'string' ? it : <JsonReport data={it} title={title} />}</li>)}
       </ul>
     </div>
   );

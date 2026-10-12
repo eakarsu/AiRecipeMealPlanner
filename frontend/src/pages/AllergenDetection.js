@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import api from '../api/axios';
 import { showToast } from '../components/ToastProvider';
+import JsonReport from '../components/JsonReport';
 
 const COMMON_ALLERGENS = ['Peanuts', 'Tree Nuts', 'Milk', 'Eggs', 'Wheat', 'Soy', 'Fish', 'Shellfish', 'Sesame', 'Mustard'];
 
@@ -140,7 +141,7 @@ function AllergenDetection() {
               <h3 className="text-sm font-semibold text-gray-700 mb-2">Suggested Substitutions</h3>
               <ul className="text-sm text-gray-700 space-y-1 list-disc pl-5">
                 {result.substitutions.map((s, i) => (
-                  <li key={i}>{typeof s === 'string' ? s : (s.replace ? <><strong>{s.replace}</strong> &rarr; {s.with || s.alternative}</> : JSON.stringify(s))}</li>
+                  <li key={i}>{typeof s === 'string' ? s : (s.replace ? <><strong>{s.replace}</strong> &rarr; {s.with || s.alternative}</> : <JsonReport data={s} title="Substitution" />)}</li>
                 ))}
               </ul>
             </div>
@@ -159,7 +160,7 @@ function Section({ title, items }) {
     <div>
       <h3 className="text-sm font-semibold text-gray-700 mb-2">{title}</h3>
       <ul className="text-sm text-gray-700 space-y-1 list-disc pl-5">
-        {items.map((it, i) => <li key={i}>{typeof it === 'string' ? it : JSON.stringify(it)}</li>)}
+        {items.map((it, i) => <li key={i}>{typeof it === 'string' ? it : <JsonReport data={it} title={title} />}</li>)}
       </ul>
     </div>
   );
